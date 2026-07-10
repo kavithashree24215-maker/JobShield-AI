@@ -50,7 +50,7 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
 
     try {
       const response = await fetch(
-        "https://splendid-rebirth-production-c82d.up.railway.app/api/scam-reports",
+        "https://splendid-rebirth-production-c82d.up.railway.app",
         {
           method: "POST",
           headers: {

@@ -177,7 +177,7 @@ export default function App() {
   const loadScamReports = async () => {
     try {
       const response = await fetch(
-        "https://jobshield-ai-production-20d1.up.railway.app/api/scam-reports",
+        "https://splendid-rebirth-production-c82d.up.railway.app",
       );
 
       const data = await response.json();
