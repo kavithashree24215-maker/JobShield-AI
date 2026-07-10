@@ -176,7 +176,9 @@ export default function App() {
 
   const loadScamReports = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/scam-reports");
+      const response = await fetch(
+        "https://jobshield-ai-production-20d1.up.railway.app/api/scam-reports",
+      );
 
       const data = await response.json();
       console.log("Scam Reports:", data);

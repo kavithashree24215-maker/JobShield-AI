@@ -49,13 +49,16 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/scam-reports", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://jobshield-ai-production-20d1.up.railway.app",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newReport),
         },
-        body: JSON.stringify(newReport),
-      });
+      );
 
       const data = await response.json();
 

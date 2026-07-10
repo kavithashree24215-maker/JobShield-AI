@@ -124,7 +124,7 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
       const idToken = await user.getIdToken();
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/analyze",
+        "https://jobshield-ai-production-20d1.up.railway.app",
         {
           title,
           company,
