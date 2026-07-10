@@ -173,21 +173,29 @@ export default function App() {
     loadScamReports();
     loadCompanies();
   }, []);
-
   const loadScamReports = async () => {
     try {
       const response = await fetch(
-        "https://splendid-rebirth-production-c82d.up.railway.app",
+        "https://splendid-rebirth-production-c82d.up.railway.app/api/scam-reports",
       );
 
       const data = await response.json();
-      console.log("Scam Reports:", data);
 
-      setScamReports(data);
+      console.log("API DATA =", data);
+
+      if (Array.isArray(data)) {
+        setScamReports(data);
+      } else if (Array.isArray(data.reports)) {
+        setScamReports(data.reports);
+      } else {
+        setScamReports([]);
+      }
     } catch (error) {
       console.error("Error loading reports:", error);
+      setScamReports([]);
     }
   };
+
   const loadCompanies = async () => {
     try {
       const snapshot = await getDocs(collection(db, "verified_companies"));
