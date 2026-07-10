@@ -1,7 +1,6 @@
 """
 JobShield AI — FastAPI Backend
 firebase_admin.py — Firebase Admin SDK initialization + Firestore client
-Place at: backend/app/firebase_admin.py
 """
 
 import os
@@ -11,39 +10,56 @@ from firebase_admin import credentials, firestore
 from functools import lru_cache
 
 
-# ─── Module-level singleton flag ──────────────────────────────────────────────
 _firebase_initialized = False
 
 
 def initialize_firebase() -> None:
     """
-    Initialize the Firebase Admin SDK exactly once.
-    Reads credentials from FIREBASE_SERVICE_ACCOUNT_JSON env var (JSON string)
-    or FIREBASE_SERVICE_ACCOUNT_PATH env var (path to a .json key file).
+    Initialize Firebase Admin SDK once.
+
+    Priority:
+    1. FIREBASE_SERVICE_ACCOUNT_JSON (Railway/Production)
+    2. FIREBASE_SERVICE_ACCOUNT_PATH (Local)
+    3. serviceAccountKey.json (Local default)
     """
+
     global _firebase_initialized
 
     if _firebase_initialized or firebase_admin._apps:
         return
 
-    # Option 1: Service account JSON stored as an environment variable (preferred for Railway/Render)
+    # Production: Railway environment variable
     service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
-    if service_account_json:
-        service_account_info = json.loads(service_account_json)
-        cred = credentials.Certificate(service_account_info)
 
-    # Option 2: Path to a local service-account key file (for local development)
+    if service_account_json:
+        try:
+            service_account_info = json.loads(service_account_json)
+
+            cred = credentials.Certificate(service_account_info)
+
+            print("Firebase initialized using FIREBASE_SERVICE_ACCOUNT_JSON")
+
+        except json.JSONDecodeError:
+            raise ValueError(
+                "FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON"
+            )
+
     else:
+        # Local development
         key_path = os.getenv(
             "FIREBASE_SERVICE_ACCOUNT_PATH",
-            "serviceAccountKey.json",  # default path for local dev
+            "serviceAccountKey.json"
         )
+
         if not os.path.exists(key_path):
             raise FileNotFoundError(
                 f"Firebase service account key not found at '{key_path}'. "
-                "Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH."
+                "Add FIREBASE_SERVICE_ACCOUNT_JSON in Railway variables."
             )
+
         cred = credentials.Certificate(key_path)
+
+        print("Firebase initialized using local serviceAccountKey.json")
 
     firebase_admin.initialize_app(cred)
     _firebase_initialized = True
@@ -52,7 +68,7 @@ def initialize_firebase() -> None:
 @lru_cache(maxsize=1)
 def get_firestore_client():
     """
-    Return a cached Firestore client.
-    The lru_cache ensures we reuse the same client across all requests.
+    Return cached Firestore client.
     """
+
     return firestore.client()
