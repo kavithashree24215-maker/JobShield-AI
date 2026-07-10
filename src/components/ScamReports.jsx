@@ -93,16 +93,16 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
   };
 
   // Filter list
+  const filteredReports = (Array.isArray(reports) ? reports : []).filter(
+    (rep) =>
+      rep.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rep.recruiterEmail?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      rep.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const formatDate = (dateString) => {
     const reportDate = new Date(dateString);
     const today = new Date();
-    const filteredReports = (Array.isArray(reports) ? reports : []).filter(
-      (rep) =>
-        rep.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rep.recruiterEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        rep.description.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
 
     const diffTime = today - reportDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
