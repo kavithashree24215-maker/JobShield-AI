@@ -124,7 +124,7 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
       const idToken = await user.getIdToken();
 
       const response = await axios.post(
-        "https://jobshield-ai-production-20d1.up.railway.app",
+        "https://splendid-rebirth-production-c82d.up.railway.app/api/scam-reports",
         {
           title,
           company,

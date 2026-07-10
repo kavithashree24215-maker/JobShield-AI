@@ -50,8 +50,7 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
 
     try {
       const response = await fetch(
-        "https://jobshield-ai-production-20d1.up.railway.app",
-        {
+        "https://splendid-rebirth-production-c82d.up.railway.app/api/scam-reports",
           method: "POST",
           headers: {
             "Content-Type": "application/json",
