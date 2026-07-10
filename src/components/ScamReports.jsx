@@ -50,7 +50,7 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
 
     try {
       const response = await fetch(
-        "https://splendid-rebirth-production-c82d.up.railway.app",
+        "https://splendid-rebirth-production-c82d.up.railway.app/apiscam-reports",
         {
           method: "POST",
           headers: {
@@ -93,15 +93,16 @@ export default function ScamReports({ reports, onSubmitReport, user }) {
   };
 
   // Filter list
-  const filteredReports = reports.filter(
-    (rep) =>
-      rep.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rep.recruiterEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rep.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+
   const formatDate = (dateString) => {
     const reportDate = new Date(dateString);
     const today = new Date();
+    const filteredReports = (Array.isArray(reports) ? reports : []).filter(
+      (rep) =>
+        rep.companyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        rep.recruiterEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        rep.description.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
 
     const diffTime = today - reportDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
