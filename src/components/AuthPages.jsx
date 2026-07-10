@@ -111,7 +111,34 @@ export default function AuthPages({
         });
       }
     } catch (error) {
-      setError(error.message);
+      switch (error.code) {
+        case "auth/invalid-credential":
+          setError("Invalid email or password.");
+          break;
+
+        case "auth/user-not-found":
+          setError("No account found with this email.");
+          break;
+
+        case "auth/wrong-password":
+          setError("Incorrect password.");
+          break;
+
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+
+        case "auth/email-already-in-use":
+          setError("Email already exists.");
+          break;
+
+        case "auth/weak-password":
+          setError("Password should be at least 6 characters.");
+          break;
+
+        default:
+          setError("Login failed. Please try again.");
+      }
     }
   };
   const handleGoogleSignIn = async () => {
