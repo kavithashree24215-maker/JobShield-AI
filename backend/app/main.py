@@ -36,10 +36,11 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",          # Vite dev server (default)
-        "http://localhost:3000",          # Alternative dev port
-        "https://jobshield-ai.vercel.app", # Replace with your real Vercel URL
-    ],
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://jobshield-ai.vercel.app",
+    "https://job-shield-ai-phi.vercel.app",
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

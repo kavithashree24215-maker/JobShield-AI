@@ -65,13 +65,13 @@ export default function AuthPages({
         if (snap.exists()) {
           userRole = snap.data().role;
         }
-
         onAuthSuccess({
+          uid: userCredential.user.uid,
           email: userCredential.user.email,
           name:
             userCredential.user.displayName ||
             userCredential.user.email.split("@")[0],
-          role,
+          role: userRole,
         });
       } else {
         if (!name) {
@@ -101,12 +101,13 @@ export default function AuthPages({
           role,
           createdAt: new Date(),
         });
-
         onAuthSuccess({
+          uid: userCredential.user.uid,
           email: userCredential.user.email,
           name:
             userCredential.user.displayName ||
             userCredential.user.email.split("@")[0],
+          role: role,
         });
       }
     } catch (error) {
@@ -132,10 +133,13 @@ export default function AuthPages({
           createdAt: new Date(),
         });
       }
+      const userData = (await getDoc(userRef)).data();
 
       onAuthSuccess({
+        uid: user.uid,
         email: user.email,
         name: user.displayName,
+        role: userData.role,
       });
     } catch (error) {
       switch (error.code) {
