@@ -27,4 +27,5 @@ dnspython==2.6.1                   # MX record lookups for email domain verifica
 slowapi==0.1.9                     # Rate limiting middleware for FastAPI
 
 # ── Logging ────────────────────────────────────────────────────────────────────
-loguru==0.7.2                      # Structured, colourful logging
+loguru==0.7.2   
+google-generativeai                   # Structured, colourful logging
