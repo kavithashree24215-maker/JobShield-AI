@@ -8,7 +8,6 @@ import {
   BarChart2,
   ShieldX,
   Info,
-  RefreshCw,
   TrendingUp,
   FileText,
   Lightbulb,
@@ -23,7 +22,6 @@ export default function DashboardOverview({
   setViewPage,
   setActiveAnalysis,
 }) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showInsightsModal, setShowInsightsModal] = useState(false);
   const [typedName, setTypedName] = useState("");
 
@@ -80,18 +78,34 @@ export default function DashboardOverview({
 
     return acc;
   }, {});
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const chartData = months.map((month) => ({
+    month,
+    count: monthlyData[month] || 0,
+  }));
+
+  const maxCount = Math.max(...chartData.map((d) => d.count), 1);
+
   const getScoreColor = (score) => {
     if (score >= 75)
       return "text-cyber-success bg-cyber-success/10 border-cyber-success/20";
     if (score >= 40)
       return "text-cyber-warning bg-cyber-warning/10 border-cyber-warning/20";
     return "text-cyber-danger bg-cyber-danger/10 border-cyber-danger/20";
-  };
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    // TODO: once the backend is connected, re-fetch `history` from the API here.
-    setTimeout(() => setIsRefreshing(false), 600);
   };
 
   const handleGenerateReport = () => {
@@ -118,16 +132,6 @@ export default function DashboardOverview({
 
         <div className="flex flex-wrap items-center gap-2 select-none">
           {/* Refresh Dashboard */}
-          <button
-            onClick={handleRefresh}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-cyber-border text-xs font-bold bg-white dark:bg-cyber-card text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
-            title="Toggles empty/populated state calculations"
-          >
-            <RefreshCw
-              className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </button>
 
           {/* AI Insights */}
           <button
@@ -251,90 +255,29 @@ export default function DashboardOverview({
           ) : (
             <div className="h-44 w-full relative">
               {/* SVG Area Chart */}
-              <svg
-                className="w-full h-full"
-                viewBox="0 0 500 150"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                  </linearGradient>
-                  <linearGradient id="roseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
+              <div className="h-44 flex items-end justify-around gap-4">
+                {chartData.map((item) => (
+                  <div
+                    key={item.month}
+                    className="flex flex-col items-center justify-end h-full"
+                  >
+                    <div
+                      className="bg-blue-500 rounded-t-lg w-10 transition-all duration-500"
+                      style={{
+                        height: `${Math.max((item.count / maxCount) * 120, 4)}px`,
+                      }}
+                    ></div>
 
-                {/* Horizontal Guide Lines */}
-                <line
-                  x1="0"
-                  y1="30"
-                  x2="500"
-                  y2="30"
-                  stroke="#cbd5e1"
-                  strokeWidth="0.5"
-                  className="dark:stroke-cyber-border/30"
-                  strokeDasharray="3"
-                />
-                <line
-                  x1="0"
-                  y1="80"
-                  x2="500"
-                  y2="80"
-                  stroke="#cbd5e1"
-                  strokeWidth="0.5"
-                  className="dark:stroke-cyber-border/30"
-                  strokeDasharray="3"
-                />
-                <line
-                  x1="0"
-                  y1="130"
-                  x2="500"
-                  y2="130"
-                  stroke="#cbd5e1"
-                  strokeWidth="0.5"
-                  className="dark:stroke-cyber-border/30"
-                  strokeDasharray="3"
-                />
+                    <span className="text-xs mt-2">{item.month}</span>
 
-                {/* Safe Job Area path */}
-                <path
-                  d="M 0 130 Q 80 70 160 110 T 320 60 T 480 30 L 500 30 L 500 150 L 0 150 Z"
-                  fill="url(#blueGrad)"
-                />
-                <path
-                  d="M 0 130 Q 80 70 160 110 T 320 60 T 480 30"
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="2.5"
-                />
-
-                {/* Scam Job Area path */}
-                <path
-                  d="M 0 145 Q 80 120 160 135 T 320 120 T 480 100 L 500 100 L 500 150 L 0 150 Z"
-                  fill="url(#roseGrad)"
-                />
-                <path
-                  d="M 0 145 Q 80 120 160 135 T 320 120 T 480 100"
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="2"
-                  strokeDasharray="2"
-                />
-              </svg>
+                    <span className="text-[10px] text-slate-500">
+                      {item.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
               {/* X Axis Labels */}
-              <div className="flex justify-between text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider mt-2.5">
-                {Object.keys(monthlyData).length === 0
-                  ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month) => (
-                      <span key={month}>{month}</span>
-                    ))
-                  : Object.keys(monthlyData).map((month) => (
-                      <span key={month}>{month}</span>
-                    ))}
-              </div>
             </div>
           )}
         </div>
