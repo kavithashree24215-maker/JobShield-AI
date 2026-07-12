@@ -4,6 +4,8 @@ schemas.py — All Pydantic v2 request and response models
 Place at: backend/app/schemas.py
 """
 
+import re
+
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, List, Dict, Any
 from datetime import datetime
@@ -48,7 +50,7 @@ class JobAnalysisRequest(BaseModel):
     recruiter_email: str  = Field(..., min_length=5,  max_length=320,  description="Recruiter email address")
     salary:          Optional[str] = Field(None, max_length=100,       description="Salary range as text")
     location:        Optional[str] = Field(None, max_length=200,       description="Job location")
-    description:     str  = Field(..., min_length=20, max_length=5000, description="Full job description text")
+    description: Optional[str] = Field("", max_length=5000, description="Full job description text")
 
     @field_validator("recruiter_email")
     @classmethod
@@ -60,9 +62,12 @@ class JobAnalysisRequest(BaseModel):
 
     @field_validator("description")
     @classmethod
-    def strip_html(cls, v: str) -> str:
-        """Remove any HTML tags before NLP processing."""
+    def strip_html(cls, v):
         import re
+
+        if not v:
+            return ""
+
         clean = re.sub(r"<[^>]+>", "", v)
         return clean.strip()
 

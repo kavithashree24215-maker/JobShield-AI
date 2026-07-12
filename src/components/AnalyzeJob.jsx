@@ -12,6 +12,8 @@ import {
   Loader2,
   CheckCircle2,
 } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AnalyzeJob({ onAnalysisComplete }) {
   // Input fields state
@@ -22,6 +24,7 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
   const [location, setLocation] = useState("");
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
 
   // PDF state
   const [pdfFile, setPdfFile] = useState(null);
@@ -122,6 +125,29 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
       }
 
       const idToken = await user.getIdToken();
+      if (!description.trim()) {
+        alert("Please enter the job description.");
+        setScanning(false);
+        return;
+      }
+      if (!description.trim()) {
+        alert("Please enter the job description.");
+        return;
+      }
+
+      if (description.trim().length < 20) {
+        setDescriptionError(
+          "⚠️ Job description must contain at least 20 characters.",
+        );
+        setScanning(false);
+        return;
+      }
+      setDescriptionError("");
+      {
+        descriptionError && (
+          <p className="text-red-500 text-sm mt-2">{descriptionError}</p>
+        );
+      }
 
       const response = await axios.post(
         "https://splendid-rebirth-production-c82d.up.railway.app/api/analyze",
@@ -139,6 +165,8 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
           },
         },
       );
+
+      console.log(response.data);
 
       setScanning(false);
 
@@ -165,11 +193,16 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
         date: response.data.date,
       });
     } catch (error) {
-      console.error("Backend Error:", error.response?.data);
-      console.error(error);
+      console.log("STATUS:", error.response?.status);
+      console.log("BACKEND RESPONSE:", error.response?.data);
+      console.log(error);
       setScanning(false);
 
-      alert("Unable to analyze the job.");
+      if (error.response?.status === 422) {
+        toast.error("Job description must contain at least 20 characters.");
+      } else {
+        toast.error("Unable to analyze the job.");
+      }
     }
   };
 
@@ -337,10 +370,18 @@ export default function AnalyzeJob({ onAnalysisComplete }) {
               <textarea
                 rows="6"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  setDescriptionError("");
+                }}
                 placeholder="Paste the full job details here including description, requirements, benefits, and instructions..."
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-cyber-border bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-cyber-primary text-xs font-semibold transition-all resize-y shadow-inner"
               ></textarea>
+              {descriptionError && (
+                <div className="mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  {descriptionError}
+                </div>
+              )}
             </div>
           </div>
 

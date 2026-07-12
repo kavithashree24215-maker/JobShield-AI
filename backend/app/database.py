@@ -11,6 +11,7 @@ Collection structure:
 
 import logging
 from datetime import datetime
+from pydoc import doc
 from typing import Optional
 
 from google.cloud.firestore_v1.base_query import FieldFilter
@@ -91,7 +92,14 @@ async def save_analysis(uid: str, analysis: JobAnalysisResponse) -> str:
 
     # Add document to the user's scans sub-collection (auto-generated ID)
     _, doc_ref = db.collection("users").document(uid).collection("scans").add(doc_data)
+    doc = doc_ref.get()
 
+    print("Firestore document:", doc.to_dict())
+    print("Date field:", doc.get("date"))
+
+    analysis.date = doc.get("date").isoformat() if doc.get("date") else ""
+    
+    
     logger.info("Saved analysis %s for user %s", doc_ref.id, uid)
     return doc_ref.id
 

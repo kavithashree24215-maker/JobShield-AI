@@ -12,6 +12,10 @@ Endpoint map:
   GET    /api/dashboard/stats       → Dashboard aggregate statistics
   GET    /api/report                → Generate full summary report
 """
+
+from datetime import datetime
+from unittest import result
+
 from firebase_admin import firestore
 from google.api_core.exceptions import ResourceExhausted
 from fastapi import Body
@@ -114,14 +118,21 @@ async def analyze_job_posting(
     result = analyze_with_gemini(body)
 
     # Persist to Firestore
-    scan_id    = await save_analysis(user.uid, result)
-    result.id  = scan_id
+    scan_id = await save_analysis(user.uid, result)
+
+    result.id = scan_id
+    result.date = datetime.utcnow().strftime("%d-%m-%Y %I:%M %p")
 
     logger.info(
         "Analysis complete — score: %d, risk: %s, saved: %s",
-        result.trust_score, result.risk_level.value, scan_id
+        result.trust_score,
+        result.risk_level.value,
+        scan_id,
     )
+
     return result
+
+    
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -137,7 +148,7 @@ async def analyze_job_posting(
 )
 async def get_history(
     limit:       int           = Query(default=20,   ge=1,  le=100, description="Items per page"),
-    start_after: Optional[str] = Query(default=None,         description="Last document ID for cursor-based pagination"),
+    start_after: Optional[str] = Query(default=None,description="Last document ID for cursor-based pagination"),
     user: UserInfo = Depends(get_current_user),
 ):
     """

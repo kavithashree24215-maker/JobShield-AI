@@ -457,21 +457,36 @@ export default function DashboardOverview({
                     </td>
                     <td className="p-5 text-center">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black ${getScoreColor(item.trustScore)}`}
+                        className={`inline-block px-3 py-1 rounded-full border text-[10px] font-black ${getScoreColor(item.trustScore ?? item.trust_score)}`}
                       >
-                        {item.trustScore}/100
+                        {item.trustScore ?? item.trust_score}/100
                       </span>
                     </td>
                     <td className="p-5">
                       <span
                         className={`text-[10px] font-extrabold uppercase tracking-wider ${item.riskLevel === "Safe" ? "text-cyber-success" : item.riskLevel === "Medium Risk" ? "text-cyber-warning" : "text-cyber-danger"}`}
                       >
-                        {item.riskLevel}
+                        {item.riskLevel ?? item.risk_level}
                       </span>
                     </td>
                     <td className="p-5 text-slate-400 font-semibold">
-                      {item.date}
+                      {item.createdAt?.seconds
+                        ? new Date(
+                            item.createdAt.seconds * 1000,
+                          ).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : item.date
+                          ? new Date(item.date).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "--"}
                     </td>
+
                     <td className="p-5 text-right">
                       <button
                         onClick={() => setActiveAnalysis(item)}

@@ -21,6 +21,8 @@ import AnalysisHistory from "./components/AnalysisHistory.jsx";
 import ScamReports from "./components/ScamReports.jsx";
 import VerifiedCompanies from "./components/VerifiedCompanies.jsx";
 import AdminPanel from "./components/AdminPanel";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { auth } from "./firebase/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
@@ -155,11 +157,16 @@ export default function App() {
         );
 
         const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map((doc) => {
+          const item = doc.data();
 
-        const data = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+          console.log("History Item:", item);
+
+          return {
+            id: doc.id,
+            ...item,
+          };
+        });
 
         setHistory(data);
       } catch (error) {
@@ -376,4 +383,19 @@ export default function App() {
       {renderSubPage()}
     </DashboardLayout>
   );
+  <>
+    <DashboardLayout
+      user={user}
+      isAdmin={isAdmin}
+      currentPage={currentPage}
+      setPage={setCurrentPage}
+      darkMode={darkMode}
+      toggleTheme={toggleTheme}
+      onLogout={logout}
+    >
+      {renderSubPage()}
+    </DashboardLayout>
+
+    <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+  </>;
 }
